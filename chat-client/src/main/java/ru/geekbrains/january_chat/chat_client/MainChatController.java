@@ -54,16 +54,19 @@ public class MainChatController implements Initializable {
         if (message.isBlank()) {
             return;
         }
-        mainChatArea.appendText(message + System.lineSeparator());
+        var recipient = contactList.getSelectionModel().getSelectedItem();
+        mainChatArea.appendText(recipient + ": " + message + System.lineSeparator());
         inputField.clear();
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         var contacts = new ArrayList<String>();
+        contacts.add("ALL");
         for (int i = 0; i < 10; i++) {
             contacts.add("Contact#" + (i + 1));
         }
         contactList.setItems(FXCollections.observableList(contacts));
+        contactList.getSelectionModel().selectFirst();
     }
 }
