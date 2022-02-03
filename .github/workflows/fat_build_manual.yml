@@ -33,7 +33,7 @@ jobs:
       - run: mvn package
 
       - name: Store artifact
-        run: mkdir staging && cp target/*dependencies.jar staging
+        run: mkdir staging && cp chat-server/target/*dependencies.jar staging
 
       - uses: actions/upload-artifact@v2
         with:
