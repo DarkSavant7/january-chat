@@ -2,8 +2,10 @@
 FROM maven:3.8.4-eclipse-temurin-17 as builder
 WORKDIR /app
 
-COPY ../pom.xml .
-COPY src src
+COPY pom.xml .
+COPY chat-server chat-server
+COPY chat-client chat-client
+COPY chat-common chat-common
 
 RUN mvn clean package
 
@@ -14,7 +16,7 @@ LABEL maintainer="Alex Grigorev"
 VOLUME /tmp
 WORKDIR /app
 #
-COPY --from=builder /app/target/*jar /app/
+COPY --from=builder /app/chat-server/target/*dependencies.jar /app/
 RUN mkdir /app/log
 RUN mkdir /app/config
 ENV JAVA_TOOL_OPTIONS=""
