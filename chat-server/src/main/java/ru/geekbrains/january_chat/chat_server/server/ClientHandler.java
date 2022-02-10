@@ -1,14 +1,18 @@
 package ru.geekbrains.january_chat.chat_server.server;
 
 import ru.geekbrains.january_chat.chat_server.error.WrongCredentialsException;
+import ru.geekbrains.january_chat.props.PropertyReader;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class ClientHandler {
+    private final long authTimeout;
     private Socket socket;
     private DataOutputStream out;
     private DataInputStream in;
@@ -17,12 +21,12 @@ public class ClientHandler {
     private String user;
 
     public ClientHandler(Socket socket, Server server) {
+        authTimeout = PropertyReader.getInstance().getAuthTimeout();
         try {
             this.server = server;
             this.socket = socket;
             this.in = new DataInputStream(socket.getInputStream());
             this.out = new DataOutputStream(socket.getOutputStream());
-//            out.write("hello world".getBytes(StandardCharsets.UTF_8));
             System.out.println("Handler created");
         } catch (IOException e) {
             System.out.println("Connection broken with user " + user);
@@ -82,8 +86,24 @@ public class ClientHandler {
 
     private void authorize() {
         System.out.println("Authorizing");
-        while (true) {
-            try {
+        var timer = new Timer(true);
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                try {
+                    if (user == null) {
+                        send("/error" + Server.REGEX + "Authentication timeout!\nPlease, try again later!");
+                        Thread.sleep(50);
+                        socket.close();
+                        System.out.println("Connection with client closed");
+                    }
+                } catch (InterruptedException | IOException e) {
+                    e.getStackTrace();
+                }
+            }
+        }, authTimeout);
+        try {
+            while (true) {
                 var message = in.readUTF();
                 if (message.startsWith("/auth")) {
                     var parsedAuthMessage = message.split(Server.REGEX);
@@ -110,9 +130,9 @@ public class ClientHandler {
                     }
 
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
