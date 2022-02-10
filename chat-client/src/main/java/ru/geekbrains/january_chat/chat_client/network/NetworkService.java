@@ -31,7 +31,7 @@ public class NetworkService {
     public void readMessages() {
         var thread = new Thread(() -> {
             try {
-                while (!Thread.currentThread().isInterrupted() && !socket.isClosed()) {
+                while (!Thread.currentThread().isInterrupted() && !socket.isClosed() ) {
                     var message = in.readUTF();
                     messageProcessor.processMessage(message);
                 }
@@ -39,7 +39,6 @@ public class NetworkService {
                 e.printStackTrace();
             }
         });
-        thread.setDaemon(true);
         thread.start();
     }
 
