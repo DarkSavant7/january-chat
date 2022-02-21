@@ -103,7 +103,7 @@ public class ClientHandler {
             }
         }, authTimeout);
         try {
-            while (true) {
+            while (!socket.isClosed()) {
                 var message = in.readUTF();
                 if (message.startsWith("/auth")) {
                     var parsedAuthMessage = message.split(Server.REGEX);
