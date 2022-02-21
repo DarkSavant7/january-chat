@@ -21,7 +21,9 @@ public class HistoryMaker {
     }
 
     public List<String> readHistory() {
-        if (!history.exists()) return Collections.singletonList("No previous history");
+        if (!history.exists()) {
+            return Collections.singletonList("No previous history");
+        }
         List<String> result = null;
         if (history.exists()) {
             try (BufferedReader reader = new BufferedReader(new FileReader(history))) {

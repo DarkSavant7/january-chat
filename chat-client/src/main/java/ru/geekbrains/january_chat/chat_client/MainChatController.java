@@ -13,7 +13,6 @@ import ru.geekbrains.january_chat.chat_client.network.NetworkService;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.ResourceBundle;
 
 public class MainChatController implements Initializable, MessageProcessor {
@@ -92,7 +91,6 @@ public class MainChatController implements Initializable, MessageProcessor {
         } else {
             networkService.sendMessage("/broadcast" + REGEX + message);
         }
-        historyMaker.writeHistory(String.format("[ME] %s\n", message));
         inputField.clear();
     }
 
