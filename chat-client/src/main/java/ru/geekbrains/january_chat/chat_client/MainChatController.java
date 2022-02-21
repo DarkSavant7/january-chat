@@ -13,6 +13,7 @@ import ru.geekbrains.january_chat.chat_client.network.NetworkService;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class MainChatController implements Initializable, MessageProcessor {
@@ -20,6 +21,7 @@ public class MainChatController implements Initializable, MessageProcessor {
 
     private String nick;
     private NetworkService networkService;
+    private HistoryMaker historyMaker;
 
     @FXML
     private VBox changeNickPanel;
@@ -90,6 +92,7 @@ public class MainChatController implements Initializable, MessageProcessor {
         } else {
             networkService.sendMessage("/broadcast" + REGEX + message);
         }
+        historyMaker.writeHistory(String.format("[ME] %s\n", message));
         inputField.clear();
     }
 
@@ -110,6 +113,11 @@ public class MainChatController implements Initializable, MessageProcessor {
                 this.nick = splitMessage[1];
                 loginPanel.setVisible(false);
                 mainChatPanel.setVisible(true);
+                this.historyMaker = new HistoryMaker(nick);
+                var history = historyMaker.readHistory();
+                for (String s : history) {
+                    mainChatArea.appendText(s + System.lineSeparator());
+                }
                 break;
             case "/error":
                 showError(splitMessage[1]);
@@ -130,6 +138,7 @@ public class MainChatController implements Initializable, MessageProcessor {
                 break;
             default:
                 mainChatArea.appendText(splitMessage[0] + System.lineSeparator());
+                historyMaker.writeHistory(splitMessage[0] + System.lineSeparator());
                 break;
         }
     }
