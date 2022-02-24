@@ -7,17 +7,21 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Server {
     public static final String REGEX = "%!%";
     private final int port;
     private final AuthService authService;
     private final List<ClientHandler> clientHandlers;
+    private final ExecutorService executorService;
 
     public Server(AuthService authService) {
         port = PropertyReader.getInstance().getPort();
         this.clientHandlers = new ArrayList<>();
         this.authService = authService;
+        this.executorService = Executors.newCachedThreadPool();
     }
 
     public void start() {
@@ -34,7 +38,6 @@ public class Server {
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            authService.stop();
             shutdown();
         }
     }
@@ -90,7 +93,8 @@ public class Server {
     }
 
     private void shutdown() {
-
+        authService.stop();
+        executorService.shutdownNow();
     }
 
     public AuthService getAuthService() {
@@ -104,5 +108,9 @@ public class Server {
             }
         }
         return null;
+    }
+
+    public ExecutorService getExecutorService() {
+        return executorService;
     }
 }
